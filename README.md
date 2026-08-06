@@ -26,6 +26,19 @@ The ordering comes from the findings themselves. About a third of the High findi
 
 ## How it runs
 
+```mermaid
+%%{init: {"flowchart": {"padding": 24, "nodeSpacing": 60, "rankSpacing": 55, "wrappingWidth": 900}}}%%
+flowchart TD
+  S["Source in scope"] --> O["Orchestrator"]
+  O --> MM["<b>Money map</b><br/>• the assets, and where they sit<br/>• every total, and which functions write it<br/>• the invariants that must always hold<br/>• lifecycles: open, accrue, close, expire<br/>• actor cohorts, and what each one is owed"]
+  O --> AT["<b>Asymmetry table</b><br/>• value moves, no total is written<br/>• written in one branch, not the sibling<br/>• never tracked anywhere at all<br/>• an operation with no inverse<br/>• a function in a family that is missing"]
+  MM --> H["Both handed to every lens, with the source"]
+  AT --> H
+  H --> L["accounting-desync · share-exchange-rate · temporal-cohort · liquidation-solvency · cross-chain-state · rounding-precision<br/>ordering-mev · dos-griefing · access-trust · integration-assumptions · edge-states · flow-completeness"]
+  L --> D["Dedup, then four judge gates"]
+  D --> R["Severity, then the report"]
+```
+
 1. Money map. The orchestrator reads the source and writes out assets, tracked totals, the asymmetry table, invariants, lifecycles and actor cohorts. Around 200 lines, injected into every lens.
 2. Twelve lenses in parallel. Each is a separate subagent with the full source, the money map, the method and its own specialty. No lens sees another lens's output, so two lenses landing on the same bug means something.
 3. Dedup. Hard gates for function isolation, mechanism preservation, mitigation preservation and completeness.
@@ -127,5 +140,3 @@ references/
 ## Notes
 
 Every attack surface in every lens is backed by verbatim titles from real findings. Keep that up when you extend a lens: add the pattern and the finding that proves it happens.
-
-Nothing in the skill is tied to a particular vendor or model, and there are no absolute paths, so it runs wherever you install it.
